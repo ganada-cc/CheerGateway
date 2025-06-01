@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cheer-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cheer-gateway
+  template:
+    metadata:
+      labels:
+        app: cheer-gateway
+    spec:
+      containers:
+        - name: cheer-gateway
+          image: ssohy/cheer-gateway:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: gateway-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cheer-gateway
+  labels:
+    app: cheer-gateway
+spec:
+  selector:
+    app: cheer-gateway
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: LoadBalancer
