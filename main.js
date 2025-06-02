@@ -50,15 +50,10 @@ const mindDiaryProxy = createProxyMiddleware({
 
 const userProxy = createProxyMiddleware({
   target: 'http://user.default.svc.cluster.local',
-  changeOrigin: true,
-  pathRewrite: { '^/user': '' },
+  changeOrigin: true
 });
 
-app.get('/', (req, res) => {
-  res.redirect('/users');
-});
-
-app.use('/users', userProxy);
+app.use('/', userProxy);
 app.use('/observediary', authenticateToken, observeDiaryProxy);
 app.use('/community', authenticateToken, communityProxy);
 app.use('/minddiary', authenticateToken, mindDiaryProxy);
