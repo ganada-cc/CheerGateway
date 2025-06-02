@@ -2,32 +2,31 @@ require('dotenv').config();
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const jwt = require('jsonwebtoken');
-const app = express();
 
+const app = express();
 const PORT = process.env.PORT || 8080;
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// 인증 미들웨어
+// 1. JWT 인증 미들웨어
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-
   if (!token) return res.status(401).json({ message: '토큰 없음' });
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) return res.status(403).json({ message: '유효하지 않은 토큰' });
-    req.user = user; // { user_id: 'sso', ... }
+    req.user = user; // { user_id, ... }
     next();
   });
 }
 
-// 마이크로서비스 라우팅
+// 2. Proxy 설정 (각 마이크로서비스 경로)
 const observeDiaryProxy = createProxyMiddleware({
-  target: 'http://observe-diary.default.svc.cluster.local', // 쿠버네티스 내부 도메인
+  target: 'http://observe-diary.default.svc.cluster.local',
   changeOrigin: true,
-  pathRewrite: { '^/observe-diary': '' },
+  pathRewrite: { '^/observediary': '/calendar' },
   onProxyReq: (proxyReq, req) => {
-    proxyReq.setHeader('X-User-Id', req.user.user_id); // 인증된 유저 ID 전달
+    proxyReq.setHeader('x-user-id', req.user.user_id);
   },
 });
 
@@ -36,16 +35,33 @@ const communityProxy = createProxyMiddleware({
   changeOrigin: true,
   pathRewrite: { '^/community': '' },
   onProxyReq: (proxyReq, req) => {
-    proxyReq.setHeader('X-User-Id', req.user.user_id);
+    proxyReq.setHeader('x-user-id', req.user.user_id);
   },
 });
 
-// 라우팅 등록
-app.use('/observe-diary', authenticateToken, observeDiaryProxy);
+const mindDiaryProxy = createProxyMiddleware({
+  target: 'http://mind-diary.default.svc.cluster.local',
+  changeOrigin: true,
+  pathRewrite: { '^/minddiary': '' },
+  onProxyReq: (proxyReq, req) => {
+    proxyReq.setHeader('x-user-id', req.user.user_id);
+  },
+});
+
+// ✅ 루트 접속 시 로그인 페이지로 리디렉션 (User 마이크로서비스)
+const userLoginProxy = createProxyMiddleware({
+  target: 'http://user.default.svc.cluster.local',
+  changeOrigin: true,
+  pathRewrite: { '^/$': '/' }, // '/' 요청 유지
+});
+
+// 3. 라우팅 등록
+app.use('/', userLoginProxy); // 루트 접속 → User 서비스의 로그인 페이지
+app.use('/observediary', authenticateToken, observeDiaryProxy);
 app.use('/community', authenticateToken, communityProxy);
+app.use('/minddiary', authenticateToken, mindDiaryProxy);
 
-
-// 서버 시작
+// 4. 서버 시작
 app.listen(PORT, () => {
-  console.log(`✅ API Gateway running on port ${PORT}`);
+  console.log(`✅ cheer-gateway is running on port ${PORT}`);
 });
