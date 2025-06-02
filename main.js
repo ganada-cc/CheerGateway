@@ -59,7 +59,7 @@ app.get('/', (req, res) => {
 });
 
 // 3. 라우팅 등록
-app.use('/', userLoginProxy); // 루트 접속 → User 서비스의 로그인 페이지
+app.use('/', userProxy); // 루트 접속 → User 서비스의 로그인 페이지
 app.use('/observediary', authenticateToken, observeDiaryProxy);
 app.use('/community', authenticateToken, communityProxy);
 app.use('/minddiary', authenticateToken, mindDiaryProxy);
