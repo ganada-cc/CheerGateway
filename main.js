@@ -55,10 +55,10 @@ const userProxy = createProxyMiddleware({
 });
 
 app.get('/', (req, res) => {
-  res.redirect('/user');
+  res.redirect('/users');
 });
 
-app.use('/user', userProxy);
+app.use('/users', userProxy);
 app.use('/observediary', authenticateToken, observeDiaryProxy);
 app.use('/community', authenticateToken, communityProxy);
 app.use('/minddiary', authenticateToken, mindDiaryProxy);
