@@ -48,10 +48,14 @@ const mindDiaryProxy = createProxyMiddleware({
   },
 });
 
-const userLoginProxy = createProxyMiddleware({
-  target: 'http://34.64.156.29', // user 서비스의 외부 IP
+const userProxy = createProxyMiddleware({
+  target: 'http://user.default.svc.cluster.local',
   changeOrigin: true,
-  pathRewrite: { '^/$': '/' },
+  pathRewrite: { '^/user': '' },
+});
+
+app.get('/', (req, res) => {
+  res.redirect('/user');
 });
 
 // 3. 라우팅 등록
