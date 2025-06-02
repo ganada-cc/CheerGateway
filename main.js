@@ -48,11 +48,10 @@ const mindDiaryProxy = createProxyMiddleware({
   },
 });
 
-// ✅ 루트 접속 시 로그인 페이지로 리디렉션 (User 마이크로서비스)
 const userLoginProxy = createProxyMiddleware({
-  target: 'http://user.default.svc.cluster.local',
+  target: 'http://34.64.156.29', // user 서비스의 외부 IP
   changeOrigin: true,
-  pathRewrite: { '^/$': '/' }, // '/' 요청 유지
+  pathRewrite: { '^/$': '/' },
 });
 
 // 3. 라우팅 등록
