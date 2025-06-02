@@ -48,9 +48,10 @@ const mindDiaryProxy = createProxyMiddleware({
   },
 });
 
-const userProxy = createProxyMiddleware({
-  target: 'http://user.default.svc.cluster.local',
-  changeOrigin: true
+const userProxy = createProxyMiddleware({ // 진짜로 DNS 문제인지 test
+  target: 'http://34.118.229.252', 
+  changeOrigin: true,
+  pathRewrite: { '^/users': '' },
 });
 
 app.use('/', userProxy);
