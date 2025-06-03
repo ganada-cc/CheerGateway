@@ -72,7 +72,10 @@ const userProxy = createProxyMiddleware({
 });
 
 // 📌 라우팅
-app.use('/calendar', authenticateToken, observeDiaryProxy);
+app.use('/calendar', (req, res, next) => {
+  console.log('[DEBUG] /calendar 요청 도착');
+  next();
+}, authenticateToken, observeDiaryProxy);
 app.use('/community', authenticateToken, communityProxy);
 app.use('/minddiary', authenticateToken, mindDiaryProxy);
 app.use('/', userProxy);
