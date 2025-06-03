@@ -42,7 +42,12 @@ const observeDiaryProxy = createProxyMiddleware({
    followRedirects: false, 
 //  pathRewrite: { '^/calendar': '' },  // 🔥 필수
   onProxyReq: (proxyReq, req) => {
+   console.log('[observe-diary] proxying request with user:', req.user);
+  if (req.user && req.user.user_id) {
     proxyReq.setHeader('x-user-id', req.user.user_id);
+  } else {
+    console.warn('❗ req.user가 설정되지 않았습니다.');
+  }
   },
 });
 
