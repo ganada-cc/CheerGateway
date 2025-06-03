@@ -7,19 +7,27 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// 1. JWT 인증 미들웨어
+// JWT 인증 미들웨어
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-  if (!token) return res.status(401).json({ message: '토큰 없음' });
+
+  if (!token) {
+    console.log('❌ 토큰이 없음');
+    return res.status(401).json({ message: '토큰 없음' });
+  }
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ message: '유효하지 않은 토큰' });
-    req.user = user; // { user_id, ... }
+    if (err) {
+      console.log('❌ 유효하지 않은 토큰:', err.message);
+      return res.status(403).json({ message: '유효하지 않은 토큰' });
+    }
+
+    console.log('✅ 토큰 파싱 성공:', user);  // ✅ 여기가 로그 포인트
+    req.user = user;
     next();
   });
 }
-
 // 2. Proxy 설정 (각 마이크로서비스 경로)
 const observeDiaryProxy = createProxyMiddleware({
   target: 'http://observe-diary.default.svc.cluster.local',
