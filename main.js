@@ -98,11 +98,14 @@ app.use((req, res, next) => {
   console.log('🔥 gateway가 실제 받은 요청:', req.method, req.originalUrl);
   next();
 });
+app.use('/community', (req, res, next) => {
+  console.log('[DEBUG] /community 요청 도착');
+  next();
+}, authenticateToken, communityProxy);
 app.use('/calendar', (req, res, next) => {
   console.log('[DEBUG] /calendar 요청 도착');
   next();
 }, authenticateToken, observeDiaryProxy);
-app.use('/community', authenticateToken, communityProxy);
 app.use('/minddiary', authenticateToken, mindDiaryProxy);
 app.use('/', userProxy);
 
