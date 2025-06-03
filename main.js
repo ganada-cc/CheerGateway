@@ -10,7 +10,10 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // JWT 인증 미들웨어
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const tokenFromHeader = authHeader && authHeader.split(' ')[1];
+  const tokenFromCookie = req.cookies['x_auth'];
+  const token = tokenFromHeader || tokenFromCookie;
+
 
   if (!token) {
     console.log('❌ 토큰이 없음');
