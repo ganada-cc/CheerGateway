@@ -24,6 +24,7 @@ function authenticateToken(req, res, next) {
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
+      console.log(err);
       console.log('❌ 유효하지 않은 토큰:', err.message);
       return res.status(403).json({ message: '유효하지 않은 토큰' });
     }
