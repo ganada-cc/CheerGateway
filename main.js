@@ -38,17 +38,17 @@ function authenticateToken(req, res, next) {
 const observeDiaryProxy = createProxyMiddleware({
   target: 'http://observe-diary.default.svc.cluster.local',
   changeOrigin: true,
-   pathRewrite: { '^/calendar': '/calendar' }, // 명시적으로 유지
   onProxyReq: (proxyReq, req) => {
     console.log('[PROXY] observe-diary 요청 전달:', req.originalUrl);
     if (req.user?.user_id) {
       proxyReq.setHeader('x-user-id', req.user.user_id);
-    } else {
-      console.warn('⚠️ [PROXY] req.user.user_id 없음!');
     }
   },
+  onProxyRes: (proxyRes, req, res) => {
+    console.log('[PROXY RES] observe-diary 응답 도착:', proxyRes.statusCode);
+  },
   onError: (err, req, res) => {
-    console.error('[PROXY ERROR]', err);  // 여기서 에러 로그 찍음!
+    console.error('[PROXY ERROR]', err);
     if (!res.headersSent) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: '프록시 요청 중 에러 발생' }));
