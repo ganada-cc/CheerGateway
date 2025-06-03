@@ -11,51 +11,47 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // JWT 인증 미들웨어
 function authenticateToken(req, res, next) {
- console.log('>>> authenticateToken 진입:', req.path, req.originalUrl, req.baseUrl);
+  console.log('>>> [AUTH] 진입:', req.method, req.originalUrl);
   const authHeader = req.headers['authorization'];
   const tokenFromHeader = authHeader && authHeader.split(' ')[1];
   const tokenFromCookie = req.cookies['x_auth'];
   const token = tokenFromHeader || tokenFromCookie;
 
   if (!token) {
-    console.log('❌ 토큰 없음');
+    console.log('❌ [AUTH] 토큰 없음');
     return res.status(401).json({ message: '토큰 없음' });
   }
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
-      console.log(err);
-      console.log('❌ 유효하지 않은 토큰:', err.message);
+      console.log('❌ [AUTH] 유효하지 않은 토큰:', err.message);
       return res.status(403).json({ message: '유효하지 않은 토큰' });
     }
 
-    console.log('✅ 토큰 파싱 성공:', user);
+    console.log('✅ [AUTH] 토큰 파싱 성공:', user);
     req.user = user;
     next();
   });
 }
 
-// 👇 /calendar → observe-diary 로 연결되도록 프록시 설정
+// 📌 /calendar → observe-diary 프록시
 const observeDiaryProxy = createProxyMiddleware({
   target: 'http://observe-diary.default.svc.cluster.local',
   changeOrigin: true,
-   followRedirects: false, 
- pathRewrite: { '^/calendar': '' },  // 🔥 필수
   onProxyReq: (proxyReq, req) => {
-   console.log('[observe-diary] proxying request with user:', req.user);
-  if (req.user && req.user.user_id) {
-    proxyReq.setHeader('x-user-id', req.user.user_id);
-  } else {
-    console.warn('❗ req.user가 설정되지 않았습니다.');
-  }
+    console.log('[PROXY] observe-diary로 요청 전달 중:', req.originalUrl);
+    if (req.user?.user_id) {
+      proxyReq.setHeader('x-user-id', req.user.user_id);
+    } else {
+      console.warn('⚠️ [PROXY] req.user.user_id 없음!');
+    }
   },
 });
 
-// 기타 프록시
+// 기타 프록시 설정
 const communityProxy = createProxyMiddleware({
   target: 'http://community.default.svc.cluster.local',
   changeOrigin: true,
-  // pathRewrite: { '^/community': '' },
   onProxyReq: (proxyReq, req) => {
     proxyReq.setHeader('x-user-id', req.user.user_id);
   },
@@ -75,12 +71,13 @@ const userProxy = createProxyMiddleware({
   changeOrigin: true,
 });
 
+// 📌 라우팅
 app.use('/calendar', authenticateToken, observeDiaryProxy);
 app.use('/community', authenticateToken, communityProxy);
 app.use('/minddiary', authenticateToken, mindDiaryProxy);
-app.use('/', userProxy);  
+app.use('/', userProxy);
 
-// 서버 실행
+// 📌 서버 실행
 app.listen(PORT, () => {
   console.log(`✅ cheer-gateway is running on port ${PORT}`);
 });
