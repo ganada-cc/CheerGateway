@@ -39,7 +39,7 @@ function authenticateToken(req, res, next) {
 const observeDiaryProxy = createProxyMiddleware({
   target: 'http://observe-diary.default.svc.cluster.local:3000',
   changeOrigin: true,
-  pathRewrite: { '^/calendar': '' },  // 🔥 필수
+//  pathRewrite: { '^/calendar': '' },  // 🔥 필수
   onProxyReq: (proxyReq, req) => {
     proxyReq.setHeader('x-user-id', req.user.user_id);
   },
@@ -69,7 +69,7 @@ const userProxy = createProxyMiddleware({
   changeOrigin: true,
 });
 
-app.use('/calendar', authenticateToken, calendarProxy);
+app.use('/calendar', authenticateToken, observeDiaryProxy);
 app.use('/community', authenticateToken, communityProxy);
 app.use('/minddiary', authenticateToken, mindDiaryProxy);
 app.use('/', userProxy);  
