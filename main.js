@@ -40,6 +40,7 @@ const observeDiaryProxy = createProxyMiddleware({
   changeOrigin: true,
   onProxyReq: (proxyReq, req) => {
     console.log('[PROXY] observe-diary 요청 전달:', req.originalUrl);
+     console.log('[PROXY] 실제 프록시 요청 경로:', proxyReq.path);
     if (req.user?.user_id) {
       proxyReq.setHeader('x-user-id', req.user.user_id);
     }
