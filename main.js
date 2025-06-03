@@ -74,10 +74,10 @@ const userProxy = createProxyMiddleware({
   changeOrigin: true,
 });
 
-app.use('/', userProxy); // 루트 및 로그인은 그대로 User 서비스에 위임
-app.use('/calendar', authenticateToken, calendarProxy); // 👈 여기 추가
+app.use('/calendar', authenticateToken, calendarProxy);
 app.use('/community', authenticateToken, communityProxy);
 app.use('/minddiary', authenticateToken, mindDiaryProxy);
+app.use('/', userProxy);  
 
 // 서버 실행
 app.listen(PORT, () => {
