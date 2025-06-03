@@ -44,25 +44,15 @@ const observeDiaryProxy = createProxyMiddleware({
   //   return rewrittenPath;
   // },
   onProxyReq: (proxyReq, req) => {
-    console.log('[PROXY] onProxyReq 호출됨');
-    console.log('[PROXY] 요청 URL:', req.originalUrl);
-    console.log('[PROXY] 실제 프록시 요청 경로:', proxyReq.path);
-    console.log('[PROXY] req.user:', req.user);
+    // console.log('[PROXY] onProxyReq 호출됨');
+    // console.log('[PROXY] 요청 URL:', req.originalUrl);
+    // console.log('[PROXY] 실제 프록시 요청 경로:', proxyReq.path);
+    // console.log('[PROXY] req.user:', req.user);
     if (req.user?.user_id) {
       proxyReq.setHeader('x-user-id', req.user.user_id);
-      console.log(`[PROXY] 헤더에 x-user-id: ${req.user.user_id} 추가됨`);
+    //  console.log(`[PROXY] 헤더에 x-user-id: ${req.user.user_id} 추가됨`);
     } else {
-      console.log('[PROXY] req.user 또는 user_id 없음, 헤더 설정 안함');
-    }
-  },
-  onProxyRes: (proxyRes, req, res) => {
-    console.log('[PROXY RES] observe-diary 응답 도착:', proxyRes.statusCode);
-  },
-  onError: (err, req, res) => {
-    console.error('[PROXY ERROR]', err);
-    if (!res.headersSent) {
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: '프록시 요청 중 에러 발생' }));
+    //  console.log('[PROXY] req.user 또는 user_id 없음, 헤더 설정 안함');
     }
   }
 });
@@ -98,14 +88,12 @@ app.use((req, res, next) => {
   console.log('🔥 gateway가 실제 받은 요청:', req.method, req.originalUrl);
   next();
 });
-app.use('/community', (req, res, next) => {
-  console.log('[DEBUG] /community 요청 도착');
-  next();
-}, authenticateToken, communityProxy);
 app.use('/calendar', (req, res, next) => {
   console.log('[DEBUG] /calendar 요청 도착');
   next();
 }, authenticateToken, observeDiaryProxy);
+app.use('/css/community', communityProxy); 
+app.use('/community', authenticateToken, communityProxy);
 app.use('/minddiary', authenticateToken, mindDiaryProxy);
 app.use('/', userProxy);
 
