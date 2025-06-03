@@ -40,7 +40,7 @@ const observeDiaryProxy = createProxyMiddleware({
   target: 'http://observe-diary.default.svc.cluster.local',
   changeOrigin: true,
    followRedirects: false, 
-//  pathRewrite: { '^/calendar': '' },  // 🔥 필수
+ pathRewrite: { '^/calendar': '' },  // 🔥 필수
   onProxyReq: (proxyReq, req) => {
     proxyReq.setHeader('x-user-id', req.user.user_id);
   },
