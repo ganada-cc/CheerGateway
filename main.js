@@ -11,7 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // JWT 인증 미들웨어
 function authenticateToken(req, res, next) {
-  console.log('>>> authenticateToken 미들웨어 진입:', req.path);
+ console.log('>>> authenticateToken 진입:', req.path, req.originalUrl, req.baseUrl);
   const authHeader = req.headers['authorization'];
   const tokenFromHeader = authHeader && authHeader.split(' ')[1];
   const tokenFromCookie = req.cookies['x_auth'];
