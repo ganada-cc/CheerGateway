@@ -36,17 +36,11 @@ function authenticateToken(req, res, next) {
 }
 
 // 👇 /calendar → observe-diary 로 연결되도록 프록시 설정
-const calendarProxy = createProxyMiddleware({
-  target: 'http://observe-diary.default.svc.cluster.local',
+const observeDiaryProxy = createProxyMiddleware({
+  target: 'http://observe-diary.default.svc.cluster.local:3000',
   changeOrigin: true,
-  // pathRewrite: { '^/calendar': '/calendar' }, // 그대로 유지
+  pathRewrite: { '^/calendar': '' },  // 🔥 필수
   onProxyReq: (proxyReq, req) => {
-     if (!req.user) {
-      console.error('❌ req.user가 없습니다! authenticateToken 미들웨어가 호출되지 않았거나 토큰 검증 실패');
-      // 원한다면 여기서 에러를 던지거나 요청을 종료할 수도 있지만,
-      // proxy 미들웨어 내에서는 에러 던지기가 어렵고 그냥 로그로 남기는 게 보통입니다.
-      return;
-    }
     proxyReq.setHeader('x-user-id', req.user.user_id);
   },
 });
