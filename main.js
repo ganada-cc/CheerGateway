@@ -68,6 +68,11 @@ const communityProxy = createProxyMiddleware({
   },
 });
 
+const cssCommunityProxy = createProxyMiddleware({
+  target: 'http://community.default.svc.cluster.local',
+  changeOrigin: true
+});
+
 const mindDiaryProxy = createProxyMiddleware({
   target: 'http://mind-diary.default.svc.cluster.local',
   changeOrigin: true,
@@ -92,7 +97,7 @@ app.use('/calendar', (req, res, next) => {
   console.log('[DEBUG] /calendar 요청 도착');
   next();
 }, authenticateToken, observeDiaryProxy);
-app.use('/css/community', communityProxy); 
+app.use('/css/community', cssCommunityProxy); 
 app.use('/community', authenticateToken, communityProxy);
 app.use('/minddiary', authenticateToken, mindDiaryProxy);
 app.use('/', userProxy);
