@@ -73,12 +73,7 @@ const userProxy = createProxyMiddleware({
 app.use('/calendar', authenticateToken, observeDiaryProxy);
 app.use('/community', authenticateToken, communityProxy);
 app.use('/minddiary', authenticateToken, mindDiaryProxy);
-app.use((req, res, next) => {
-  if (req.path === '/') {
-    return userProxy(req, res, next);
-  }
-  next();
-}); 
+app.use('/', userProxy);  
 
 // 서버 실행
 app.listen(PORT, () => {
