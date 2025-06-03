@@ -37,7 +37,7 @@ function authenticateToken(req, res, next) {
 
 // 👇 /calendar → observe-diary 로 연결되도록 프록시 설정
 const observeDiaryProxy = createProxyMiddleware({
-  target: 'http://observe-diary.default.svc.cluster.local:3000',
+  target: 'http://observe-diary.default.svc.cluster.local',
   changeOrigin: true,
 //  pathRewrite: { '^/calendar': '' },  // 🔥 필수
   onProxyReq: (proxyReq, req) => {
