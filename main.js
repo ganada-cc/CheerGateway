@@ -38,11 +38,11 @@ function authenticateToken(req, res, next) {
 const observeDiaryProxy = createProxyMiddleware({
   target: 'http://observe-diary.default.svc.cluster.local',
   changeOrigin: true,
-  pathRewrite: (path, req) => {
-    const rewrittenPath = '/calendar' + path;  // 필요에 따라 조절
-    console.log('[pathRewrite] 원본 path:', path, '→ 재작성된 path:', rewrittenPath);
-    return rewrittenPath;
-  },
+  // pathRewrite: (path, req) => {
+  //   const rewrittenPath = '/calendar' + path;  // 필요에 따라 조절
+  //   console.log('[pathRewrite] 원본 path:', path, '→ 재작성된 path:', rewrittenPath);
+  //   return rewrittenPath;
+  // },
   onProxyReq: (proxyReq, req) => {
     console.log('[PROXY] onProxyReq 호출됨');
     console.log('[PROXY] 요청 URL:', req.originalUrl);
