@@ -39,15 +39,20 @@ const observeDiaryProxy = createProxyMiddleware({
   target: 'http://observe-diary.default.svc.cluster.local',
   changeOrigin: true,
   pathRewrite: (path, req) => {
-    console.log('[pathRewrite] 원본 path:', path);
-    // 그대로 유지
-    return '/calendar' + path;
+    const rewrittenPath = '/calendar' + path;  // 필요에 따라 조절
+    console.log('[pathRewrite] 원본 path:', path, '→ 재작성된 path:', rewrittenPath);
+    return rewrittenPath;
   },
   onProxyReq: (proxyReq, req) => {
-    console.log('[PROXY] observe-diary 요청 전달:', req.originalUrl);
+    console.log('[PROXY] onProxyReq 호출됨');
+    console.log('[PROXY] 요청 URL:', req.originalUrl);
     console.log('[PROXY] 실제 프록시 요청 경로:', proxyReq.path);
+    console.log('[PROXY] req.user:', req.user);
     if (req.user?.user_id) {
       proxyReq.setHeader('x-user-id', req.user.user_id);
+      console.log(`[PROXY] 헤더에 x-user-id: ${req.user.user_id} 추가됨`);
+    } else {
+      console.log('[PROXY] req.user 또는 user_id 없음, 헤더 설정 안함');
     }
   },
   onProxyRes: (proxyRes, req, res) => {
