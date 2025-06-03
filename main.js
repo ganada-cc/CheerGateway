@@ -41,7 +41,7 @@ const observeDiaryProxy = createProxyMiddleware({
   pathRewrite: (path, req) => {
     console.log('[pathRewrite] 원본 path:', path);
     // 그대로 유지
-    return path;
+    return '/calendar' + path;
   },
   onProxyReq: (proxyReq, req) => {
     console.log('[PROXY] observe-diary 요청 전달:', req.originalUrl);
