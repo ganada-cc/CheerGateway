@@ -82,6 +82,11 @@ const userProxy = createProxyMiddleware({
 });
 
 // 📌 라우팅
+// ✅ 여기! 가장 위에 추가
+app.use((req, res, next) => {
+  console.log('🔥 gateway가 실제 받은 요청:', req.method, req.originalUrl);
+  next();
+});
 app.use('/calendar', (req, res, next) => {
   console.log('[DEBUG] /calendar 요청 도착');
   next();
