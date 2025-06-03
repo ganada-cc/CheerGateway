@@ -49,7 +49,7 @@ const observeDiaryProxy = createProxyMiddleware({
 const communityProxy = createProxyMiddleware({
   target: 'http://community.default.svc.cluster.local',
   changeOrigin: true,
-  pathRewrite: { '^/community': '' },
+  // pathRewrite: { '^/community': '' },
   onProxyReq: (proxyReq, req) => {
     proxyReq.setHeader('x-user-id', req.user.user_id);
   },
