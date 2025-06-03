@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 
@@ -16,9 +17,8 @@ function authenticateToken(req, res, next) {
   const tokenFromCookie = req.cookies['x_auth'];
   const token = tokenFromHeader || tokenFromCookie;
 
-
   if (!token) {
-    console.log('❌ 토큰이 없음');
+    console.log('❌ 토큰 없음');
     return res.status(401).json({ message: '토큰 없음' });
   }
 
@@ -28,21 +28,23 @@ function authenticateToken(req, res, next) {
       return res.status(403).json({ message: '유효하지 않은 토큰' });
     }
 
-    console.log('✅ 토큰 파싱 성공:', user);  // ✅ 여기가 로그 포인트
+    console.log('✅ 토큰 파싱 성공:', user);
     req.user = user;
     next();
   });
 }
-// 2. Proxy 설정 (각 마이크로서비스 경로)
-const observeDiaryProxy = createProxyMiddleware({
+
+// 👇 /calendar → observe-diary 로 연결되도록 프록시 설정
+const calendarProxy = createProxyMiddleware({
   target: 'http://observe-diary.default.svc.cluster.local',
   changeOrigin: true,
-  pathRewrite: { '^/observediary': '/calendar' },
+  pathRewrite: { '^/calendar': '/calendar' }, // 그대로 유지
   onProxyReq: (proxyReq, req) => {
     proxyReq.setHeader('x-user-id', req.user.user_id);
   },
 });
 
+// 기타 프록시
 const communityProxy = createProxyMiddleware({
   target: 'http://community.default.svc.cluster.local',
   changeOrigin: true,
@@ -61,19 +63,17 @@ const mindDiaryProxy = createProxyMiddleware({
   },
 });
 
-const userLoginProxy = createProxyMiddleware({
+const userProxy = createProxyMiddleware({
   target: 'http://user.default.svc.cluster.local',
   changeOrigin: true,
-  pathRewrite: { '^/$': '/' }, // '/' 요청 유지
 });
 
-// 3. 라우팅 등록
-app.use('/', userLoginProxy); // 루트 접속 → User 서비스의 로그인 페이지
-app.use('/observediary', authenticateToken, observeDiaryProxy);
+app.use('/', userProxy); // 루트 및 로그인은 그대로 User 서비스에 위임
+app.use('/calendar', authenticateToken, calendarProxy); // 👈 여기 추가
 app.use('/community', authenticateToken, communityProxy);
 app.use('/minddiary', authenticateToken, mindDiaryProxy);
 
-// 4. 서버 시작
+// 서버 실행
 app.listen(PORT, () => {
-  console.log(`cheer-gateway is running on port ${PORT}`);
+  console.log(`✅ cheer-gateway is running on port ${PORT}`);
 });
