@@ -19,7 +19,8 @@ function authenticateToken(req, res, next) {
 
   if (!token) {
     console.log('❌ [AUTH] 토큰 없음');
-    return res.status(401).json({ message: '토큰 없음' });
+    req.url = '/';
+    return userProxy(req, res);
   }
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
