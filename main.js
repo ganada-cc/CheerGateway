@@ -19,13 +19,13 @@ function authenticateToken(req, res, next) {
 
   if (!token) {
     console.log('❌ [AUTH] 토큰 없음');
-    return res.redirect('/');
+    return res.status(401).json({ message: '토큰 없음' });
   }
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
       console.log('❌ [AUTH] 유효하지 않은 토큰:', err.message);
-      return res.redirect('/');
+      return res.status(403).json({ message: '유효하지 않은 토큰' });
     }
 
     console.log('✅ [AUTH] 토큰 파싱 성공:', user);
