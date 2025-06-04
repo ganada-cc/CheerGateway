@@ -95,7 +95,7 @@ app.use('/calendar', (req, res, next) => {
 }, authenticateToken, observeDiaryProxy);
 app.use('/css/community', cssCommunityProxy); 
 app.use('/community', authenticateToken, communityProxy);
-app.use('/calendar/minddiary', authenticateToken, mindDiaryProxy);
+app.use('/minddiary', authenticateToken, mindDiaryProxy);
 app.use('/', userProxy);
 
 // 📌 서버 실행
