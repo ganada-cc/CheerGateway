@@ -57,9 +57,6 @@ const observeDiaryProxy = createProxyMiddleware({
   }
 });
 
-
-
-// 기타 프록시 설정
 const communityProxy = createProxyMiddleware({
   target: 'http://community.default.svc.cluster.local',
   changeOrigin: true,
@@ -76,7 +73,6 @@ const cssCommunityProxy = createProxyMiddleware({
 const mindDiaryProxy = createProxyMiddleware({
   target: 'http://mind-diary.default.svc.cluster.local',
   changeOrigin: true,
-  pathRewrite: { '^/minddiary': '' },
   onProxyReq: (proxyReq, req) => {
     proxyReq.setHeader('x-user-id', req.user.user_id);
   },
@@ -99,7 +95,7 @@ app.use('/calendar', (req, res, next) => {
 }, authenticateToken, observeDiaryProxy);
 app.use('/css/community', cssCommunityProxy); 
 app.use('/community', authenticateToken, communityProxy);
-app.use('/minddiary', authenticateToken, mindDiaryProxy);
+app.use('/calendar/minddiary', authenticateToken, mindDiaryProxy);
 app.use('/', userProxy);
 
 // 📌 서버 실행
