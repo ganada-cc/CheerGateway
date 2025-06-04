@@ -19,8 +19,8 @@ function authenticateToken(req, res, next) {
 
   if (!token) {
     console.log('❌ [AUTH] 토큰 없음');
-    req.url = '/';
-    return userProxy(req, res);
+    res.writeHead(302, { Location: '/' }); // 로그인 페이지로 리디렉션
+    return res.end();
   }
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
