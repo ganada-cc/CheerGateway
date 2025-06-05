@@ -75,7 +75,16 @@ const mindDiaryProxy = createProxyMiddleware({
   target: 'http://minddiary.default.svc.cluster.local',
   changeOrigin: true,
   onProxyReq: (proxyReq, req) => {
-    proxyReq.setHeader('x-user-id', req.user.user_id);
+    console.log('[PROXY] onProxyReq 호출됨');
+    console.log('[PROXY] 요청 URL:', req.originalUrl);
+    console.log('[PROXY] 실제 프록시 요청 경로:', proxyReq.path);
+    console.log('[PROXY] req.user:', req.user);
+    if (req.user?.user_id) {
+      proxyReq.setHeader('x-user-id', req.user.user_id);
+     console.log(`[PROXY] 헤더에 x-user-id: ${req.user.user_id} 추가됨`);
+    } else {
+     console.log('[PROXY] req.user 또는 user_id 없음, 헤더 설정 안함');
+    }
   },
 });
 
