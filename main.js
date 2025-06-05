@@ -35,7 +35,7 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// 📌 /calendar → observe-diary 프록시
+// 프록시
 const observeDiaryProxy = createProxyMiddleware({
   target: 'http://observe-diary.default.svc.cluster.local',
   changeOrigin: true,
@@ -74,6 +74,7 @@ const cssCommunityProxy = createProxyMiddleware({
 const mindDiaryProxy = createProxyMiddleware({
   target: 'http://minddiary.default.svc.cluster.local',
   changeOrigin: true,
+  pathRewrite: { '^/minddiary': '' }, // 수정
   onProxyReq: (proxyReq, req) => {
     console.log('[PROXY] onProxyReq 호출됨');
     console.log('[PROXY] 요청 URL:', req.originalUrl);
