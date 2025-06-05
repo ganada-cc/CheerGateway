@@ -71,7 +71,7 @@ const cssCommunityProxy = createProxyMiddleware({
 });
 
 const mindDiaryProxy = createProxyMiddleware({
-  target: 'http://mind-diary.default.svc.cluster.local',
+  target: 'http://minddiary.default.svc.cluster.local',
   changeOrigin: true,
   onProxyReq: (proxyReq, req) => {
     proxyReq.setHeader('x-user-id', req.user.user_id);
