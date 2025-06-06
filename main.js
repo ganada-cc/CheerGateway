@@ -108,7 +108,7 @@ app.use('/community', authenticateToken, communityProxy);
 app.use('/minddiary', authenticateToken, mindDiaryProxy);
 app.use('/', userProxy);
 
-// 서버 실행
+// 서버 실행중
 app.listen(PORT, () => {
   console.log(`cheer-gateway is running`);
 });
