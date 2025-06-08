@@ -108,6 +108,15 @@ app.use('/community', authenticateToken, communityProxy);
 app.use('/minddiary', authenticateToken, mindDiaryProxy);
 app.use('/', userProxy);
 
+// 헬스 체크 라우트
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
+app.get('/ready', (req, res) => {
+  res.status(200).send('Ready');
+});
+
 // 서버 실행중
 app.listen(PORT, () => {
   console.log(`cheer-gateway is running`);
