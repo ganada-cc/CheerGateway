@@ -25,7 +25,7 @@ function authenticateToken(req, res, next) {
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
-      console.log('[AUTH] 유효하지 않은 토큰:', err.message);
+      // console.log('[AUTH] 유효하지 않은 토큰:', err.message);
       res.writeHead(302, { Location: '/' }); // 로그인 페이지로 리디렉션
       return res.end();
     }
